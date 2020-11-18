@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+      "baseUrl": ".",
+      "outDir": "./output",
+      "target": "es5",
+      "moduleResolution": "node",
+      "lib": ["esnext", "dom"],
+      "sourceMap": false,
+      "declaration": false,
+      "esModuleInterop": true,
+      "allowJs": true,
+      "typeRoots": ["./node_modules/@types"],
+      "paths": {
+        "*": ["*","modules/*"]
+      }
+  },
+  "include": [
+    "demo",
+    "modules"
+  ]
+}

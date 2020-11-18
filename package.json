@@ -1,0 +1,33 @@
+{
+  "name": "@vallrand/vinculum",
+  "version": "0.0.1",
+  "description": "ecs/ts demo",
+  "scripts": {
+    "build": "webpack -p --config ./webpack.config.js",
+    "start": "webpack-dev-server --config ./webpack.config.js",
+    "prepare": "node ./tasks/prepare.js ./demo/assets ./output"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vallrand/vinculum.git"
+  },
+  "author": "Wilhelm Vallrand",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vallrand/vinculum/issues"
+  },
+  "homepage": "https://github.com/vallrand/vinculum#readme",
+  "devDependencies": {
+    "clean-webpack-plugin": "^3.0.0",
+    "css-loader": "^3.6.0",
+    "html-webpack-plugin": "^4.3.0",
+    "mini-css-extract-plugin": "^0.9.0",
+    "pngquant": "^3.0.0",
+    "raw-loader": "^4.0.1",
+    "ts-loader": "^8.0.1",
+    "typescript": "^3.9.7",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
+  }
+}

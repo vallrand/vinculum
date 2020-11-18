@@ -1,0 +1,99 @@
+.spinner-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 64;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    align-content: center;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(#223333, #080404);
+}
+.spinner-bar {
+    display: flex;
+    align-content: center;
+    justify-content: space-evenly;
+    width: 76vmin;
+    height: 8vmin;
+}
+
+.spinner-bar-segment {
+    height: 100%;
+    width: 6%;
+    background-color: #1b0c0c;
+    animation: spinner-bar-segment-animation 1.6s infinite ease-out;
+}
+
+.spinner-bar-segment-glow {
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    background-color: #b0ffda;
+    box-shadow: 0px 0px 8px 2px #b0ffda;
+    transition: opacity 0.5s;
+}
+
+@keyframes spinner-bar-segment-animation {
+    0%, 50%, 100% {
+        transform: scale3D(1, 1, 1);
+    } 25% {
+        transform: scale3D(0.74, 0.16, 1);
+    }
+}
+
+.spinner-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 50%;
+    width: 100%;
+}
+
+.spinner-play-icon {
+    display: flex;
+    background-color: #1b0c0c;
+    transition: background-color 1s, box-shadow 1s;
+}
+.spinner-play-icon.enabled {
+    background-color: #b0ffda;
+    box-shadow: 0px 0px 8px 2px #b0ffda;
+}
+
+.spinner-play-triangle {
+    position: relative;
+    background-color: #1b0c0c;
+    text-align: left;
+    margin: 1em 2em 2em 1em;
+}
+
+.spinner-play-triangle:before,
+.spinner-play-triangle:after {
+    content: '';
+    position: absolute;
+    background-color: inherit;
+}
+
+.spinner-play-triangle,
+.spinner-play-triangle:before,
+.spinner-play-triangle:after {
+    width:  2em;
+    height: 2em;
+    border-top-right-radius: 30%;
+}
+  
+.spinner-play-triangle {
+    transform: rotate(-90deg) skewX(-30deg) scale(1,.866);
+}
+.spinner-play-triangle:before {
+    transform: rotate(-135deg) skewX(-45deg) scale(1.414,.707) translate(0,-50%);
+}
+.spinner-play-triangle:after {
+    transform: rotate(135deg) skewY(-45deg) scale(.707,1.414) translate(50%);
+}
