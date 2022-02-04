@@ -34,7 +34,7 @@ function create(position: vec2){
         samplers: {
             [animationKey]: KeyframeSampler<number>(lerp)([
                 { time: 0, value: 0 },
-                { time: 0.3, value: 800, ease: ease.quadOut },
+                { time: 0.5, value: 800, ease: ease.sineIn },
                 { time: 0.8, value: 200, ease: ease.quadOut },
                 { time: 2, value: 1200, ease: ease.sineOut }
             ])
@@ -45,9 +45,9 @@ function create(position: vec2){
         samplers: {
             [animationKey]: KeyframeSampler<number>(lerp)([
                 { time: 0, value: 0 },
-                { time: 0.3, value: -0.6, ease: ease.quadOut },
-                { time: 0.8, value: 0.4, ease: ease.sineInOut },
-                { time: 2, value: 0, ease: ease.sineInOut }
+                { time: 0.5, value: -0.5, ease: ease.sineIn },
+                { time: 0.8, value: 0.3, ease: ease.sineIn },
+                { time: 2, value: 0, ease: ease.sineOut }
             ])
         }
     }]) as AnimationMixer

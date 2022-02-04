@@ -10,6 +10,7 @@ import './editor.css'
 export class EditorSystem extends ProcedureSystem {
     private readonly subsystems: EditorSubSystem[]
 
+    private readonly enabled: boolean = /debug/.test(location.search)
     private readonly cameraGroup: EntityGroup
     private pressed: boolean = false
     private prevZoom: number = 0
@@ -28,6 +29,7 @@ export class EditorSystem extends ProcedureSystem {
 
     constructor(manager: EntityManager, subsystems: Array<new (manager: EntityManager) => EditorSubSystem>){
         super(manager)
+        if(!this.enabled) return
         this.cameraGroup = this.manager.queryEntityGroup([Transform2D, Camera2D])
         this.subsystems = subsystems.map(SubSystem => new SubSystem(this.manager))
 
@@ -40,17 +42,18 @@ export class EditorSystem extends ProcedureSystem {
             HTMLNode('div', { className: 'horizontal', style: { width: '100%' } }, subsystems.map(system => (
                 HTMLNode('div', { className: 'editor-tab', innerText: system.key }, null, {
                     click(event: Event){
+                        const toggle = !(event.target as HTMLDivElement).classList.contains('active')
                         document.querySelectorAll('.editor-tab').forEach((node: HTMLDivElement) =>
-                            event.target === node
+                            event.target === node && toggle
                                 ? node.classList.add('active')
                                 : node.classList.remove('active')
                         )
                         document.querySelectorAll('.editor-menu').forEach((node: HTMLDivElement) =>
-                            node.dataset.key === system.key
+                            node.dataset.key === system.key && toggle
                                 ? node.style.removeProperty('display')
                                 : node.style.setProperty('display', 'none')
                         )
-                        subsystems.forEach(subsystem => subsystem.enabled = subsystem === system)
+                        subsystems.forEach(subsystem => subsystem.enabled = subsystem === system && toggle)
                     }
                 })
             ))),
@@ -64,6 +67,7 @@ export class EditorSystem extends ProcedureSystem {
         ])
     }
     execute(context: IUpdateContext){
+        if(!this.enabled) return
         const pointerDeviceSystem = this.manager.resolveSystem(PointerDeviceSystem)
         const pressed = pointerDeviceSystem.pressure[0]
         const normalizedCoordinates = pointerDeviceSystem.pointers[0]

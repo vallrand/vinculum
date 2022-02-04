@@ -12,7 +12,7 @@ const bitmap = require('./bitmap')
 module.exports = options => {
     const preprocess = [
         bitmap.trim(options.trim || { alphaThreshold: 0 }),
-        bitmap.pad(options.pad || { extrude: false, padding: 1 })
+        bitmap.pad(options.pad || { extrude: true, padding: 1 })
     ]
     const sprites = []
     const templateFilename = 'spritesheet_'

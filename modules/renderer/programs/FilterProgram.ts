@@ -38,7 +38,7 @@ export class FilterProgram {
         if(shaderMaterial) ShaderMaterial.synchronize(shaderMaterial.attributes, shader)
         shader.bind()
 
-        applyBlendMode[shaderMaterial ? shaderMaterial.blend : BlendMode.NONE](gl, globalUniforms.premultipliedAlpha)
+        applyBlendMode[shaderMaterial ? shaderMaterial.blend : BlendMode.NONE](gl, false)
 
         target.viewbox(0, 0, source.viewport[2], source.viewport[3])
         target.bind()

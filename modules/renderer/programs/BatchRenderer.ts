@@ -34,13 +34,14 @@ export class BatchRenderer implements IRenderer2D {
     constructor(
         private readonly MAX_VERTICES = 4 * 1024,
         private readonly MAX_INDICES = 6 * 1024,
-        private readonly FIXED_INDICES = null
+        private readonly FIXED_INDICES = null,
+        private readonly PREMULTIPLY_ALPHA = true
     ){}
     initialize(gl: GLContext): void {
         this.gl = gl
         this.shader = new Shader(gl,
             require('../shaders/batch_vert.glsl'),
-            generateFragmentShader(gl.MAX_TEXTURES))
+            generateFragmentShader(gl.MAX_TEXTURES, this.PREMULTIPLY_ALPHA))
         this.shader.uao['uSamplers'] = range(gl.MAX_TEXTURES)
 
         if(this.FIXED_INDICES){
@@ -59,7 +60,8 @@ export class BatchRenderer implements IRenderer2D {
     }
     render(globalUniforms: GlobalUniforms, geometry: Geometry2D, material: Material): void {
         const { vertices, uvs, indices, colors } = geometry
-        const { diffuse, blend } = material
+        const diffuse = material.diffuse
+        const blend = this.PREMULTIPLY_ALPHA && material.blend === BlendMode.ADD ? BlendMode.NORMAL : material.blend
 
         const indexCount = indices.length
         const vertexCount = vertices.length >>> 1
@@ -74,8 +76,9 @@ export class BatchRenderer implements IRenderer2D {
 
         if(textureIndex == -1) textureIndex = this.textures.push(diffuse.texture) - 1
         this.blending = blend
-        const color: number = rgba.uint8Hex(material.color)
-        const tint: number = rgb.uint8Hex(material.tint) | textureIndex << 24
+        const color: number = rgba.uint8Hex(material.color, material.alpha)
+        const tint: number = rgb.uint8Hex(material.tint, material.alpha) | textureIndex << 24
+        const mask = blend === BlendMode.NORMAL && material.blend === BlendMode.ADD ? 0xFFFFFF : 0xFFFFFFFF
 
         const indexView: ArrayBufferView = this.indexBuffer.data
         const float32View: ArrayBufferView = this.vertexBuffer.dataView(GL.FLOAT)
@@ -92,7 +95,7 @@ export class BatchRenderer implements IRenderer2D {
             float32View[index + 0] = vertices[2 * i + 0]
             float32View[index + 1] = vertices[2 * i + 1]
             uint32View[index + 2] = uvs[i]
-            uint32View[index + 3] = colors ? colors[i] : color
+            uint32View[index + 3] = (colors ? colors[i] : color) & mask
             uint32View[index + 4] = tint
         }
         this.vertexOffset += vertexCount
@@ -112,7 +115,7 @@ export class BatchRenderer implements IRenderer2D {
         this.shader.uao['uProjectionMatrix'] = globalUniforms['viewMatrix']
         this.shader.bind()
 
-        applyBlendMode[this.blending](gl, globalUniforms.premultipliedAlpha)
+        applyBlendMode[this.blending](gl, this.PREMULTIPLY_ALPHA)
 
         this.vao.render(GL.TRIANGLES, indexOffset, 0)
 

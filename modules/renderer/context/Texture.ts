@@ -35,6 +35,7 @@ export class Texture {
     private readonly texture: WebGLTexture
     width: number = 0
     height: number = 0
+    premultiply: boolean = false
     private mipmaps: boolean = false
     constructor(private readonly gl: GLContext, readonly internalFormat: number = GL.RGBA){
         this.texture = gl.createTexture()
@@ -66,7 +67,7 @@ export class Texture {
         }
 
         gl.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL, flipY)
-        gl.pixelStorei(GL.UNPACK_PREMULTIPLY_ALPHA_WEBGL, premultiplyAlpha)
+        gl.pixelStorei(GL.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this.premultiply = premultiplyAlpha)
 
         if(sourceWidth != null || sourceHeight != null) gl.texImage2D(
             GL.TEXTURE_2D, 0, internalFormat, format, type,

@@ -42,7 +42,7 @@ function(this: Store, resource: IResource){
     const texture: Texture = new Texture(gl)
     texture.upload(resource.data, {
         flipY: false,
-        premultiplyAlpha: false,
+        premultiplyAlpha: true,
         wrap: GL.REPEAT,
         minFilter: GL.LINEAR_MIPMAP_NEAREST,
         magFilter: GL.LINEAR

@@ -47,16 +47,18 @@ float frame(in float width){
 }
 
 void main(void){
-    vec2 uv = vWorldPosition * 0.01;
-    float rz = fbm(uv, uTime);
+    vec2 uv = vWorldPosition * 0.016;
+    float fr = frame(0.1);
+    float rz = fbm(uv, uTime) * smoothstep(.0,.5,fr);
 
     vec3 color = vec3(1.0-rz*rz, 0.2 / rz, 0.2 / rz);
     color = pow(color, vec3(1.6,2.0,2.0));
 
     float width = 0.2;
-    float edge = mix(-width, 1.0, vColor.a * frame(0.1));
+    float edge = mix(-width, 1.0, vColor.a * fr);
     float fade = smoothstep(edge, edge + width, clamp(color.r,0.0,1.0));
     color.gb *= smoothstep(0.8, 0.5, fade);
-    
+
+    color.rgb = floor(color.rgb * 8. + .5) / 8.;
     gl_FragColor = vec4(vColor.rgb * color, 1.0 - fade);
 }

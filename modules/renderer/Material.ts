@@ -22,6 +22,12 @@ export class Material<Options extends MaterialOptions = MaterialOptions> extends
     public diffuse: TextureResource
     public blend: BlendMode = BlendMode.NONE
 
+    public get alpha(): number {
+        return this.premultiply ? this.color[3]/0xFF : 1
+    }
+    public get premultiply(): boolean {
+        return this.diffuse.texture?.premultiply
+    }
     public get renderable(): boolean {
         return this.color[3] != 0
     }

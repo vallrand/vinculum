@@ -21,7 +21,6 @@ export class Renderer2DSystem extends ProcedureSystem {
     public readonly renderTargetPool: RenderTargetPool
     private readonly filterProgram: FilterProgram
     private readonly globalUniforms: GlobalUniforms = {
-        premultipliedAlpha: false,
         defaultTexture: null,
         defaultRenderTarget: null,
         renderTarget: null,

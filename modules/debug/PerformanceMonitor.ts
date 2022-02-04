@@ -30,9 +30,10 @@ export class PerformanceMonitor extends EditorSubSystem {
 
 
         if(this.updateContext.frame % 10 == 0){
-            this.menu.elapsed.innerText = this.state.elapsed.sort((b, a) => a.value - b.value)
-            .slice(0, 6)
-            .map(counter => `${counter.name}:${(counter.value / 10).toFixed(2)}`).join('\n')
+            this.state.elapsed.sort((b, a) => a.value - b.value)
+            this.menu.elapsed.innerText = this.state.elapsed.slice(0, 6)
+            .map(counter => (counter.value / 10).toFixed(2)).join('|') + ' - ' +
+            this.state.elapsed.slice(0, 6).map(counter => counter.name).join('|')
             this.state.elapsed.forEach(counter => counter.value = 0)
         }
     }
@@ -71,12 +72,16 @@ export class PerformanceMonitor extends EditorSubSystem {
     buildMenu(){
         this.menu.drawCalls = HTMLNode('div', { className: 'horizontal', innerText: '' })
         this.menu.fps = HTMLNode('div', { className: 'horizontal', innerText: '' })
-        this.menu.elapsed = HTMLNode('div', { className: 'horizontal', innerText: '' })
+        this.menu.elapsed = HTMLNode('div', { className: 'horizontal', style: { whiteSpace: 'nowrap' }, innerText: '' })
 
-        return [HTMLNode('div', { className: 'vertical' }, [
-            HTMLNode('div', { className: 'horizontal', innerText: 'DrawCalls: ' }, [this.menu.drawCalls]),
-            HTMLNode('div', { className: 'horizontal', innerText: 'FPS: ' }, [this.menu.fps]),
-            HTMLNode('div', { className: 'horizontal', innerText: 'Elapsed: ' }, [this.menu.elapsed])
+        return [HTMLNode('div', { className: 'horizontal' }, [
+            HTMLNode('div', { className: 'vertical' }, [
+                HTMLNode('div', { className: 'horizontal', innerText: 'DrawCalls: ' }, [this.menu.drawCalls]),
+                HTMLNode('div', { className: 'horizontal', innerText: 'FPS: ' }, [this.menu.fps]),
+            ]),
+            HTMLNode('div', { className: 'vertical' }, [
+                HTMLNode('div', { className: 'horizontal', innerText: 'Elapsed: ' }, [this.menu.elapsed])
+            ])
         ])]
     }
 }

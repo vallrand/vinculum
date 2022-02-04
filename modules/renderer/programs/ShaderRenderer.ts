@@ -69,7 +69,7 @@ export class ShaderRenderer implements IRenderer2D {
         this.shader = shader
         this.shaderAttributes = attributes
         this.blending = blend
-        const color: number = rgba.uint8Hex(material.color)
+        const color: number = rgba.uint8Hex(material.color, material.alpha)
 
         const indexView: ArrayBufferView = this.indexBuffer.data
         const float32View: ArrayBufferView = this.vertexBuffer.dataView(GL.FLOAT)
@@ -102,7 +102,7 @@ export class ShaderRenderer implements IRenderer2D {
         ShaderMaterial.synchronize(this.shaderAttributes, shader)
         shader.bind()
 
-        applyBlendMode[this.blending](gl, globalUniforms.premultipliedAlpha)
+        applyBlendMode[this.blending](gl, false)
 
         this.vao.render(GL.TRIANGLES, indexOffset, 0)
 

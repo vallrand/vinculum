@@ -55,8 +55,8 @@ import { Display } from 'common/Display'
 import { SystemInitializer, ProcedureSystem, EntityManager, ProcedureUpdateSystem, IUpdateContext } from 'framework'
 
 import {
-    //PerformanceMonitor,
-	CameraController, AudioSettings, GridLineLayer, PhysicsDebugSystem, EntitySelector,
+    PerformanceMonitor, CameraController, AudioSettings, GridLineLayer,
+    PhysicsDebugSystem, EntitySelector,
     //ShapeConstructor, PuzzleCreator, RegionCreator,
     EditorSystem
 } from './debug'
@@ -98,7 +98,7 @@ export default function Application({
     .registerSystem(PointerDeviceSystem, null)
 
     .registerSystem(EditorSystem, [
-        //PerformanceMonitor,
+        PerformanceMonitor,
         CameraController,
         AudioSettings,
         GridLineLayer,

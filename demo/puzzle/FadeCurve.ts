@@ -31,7 +31,7 @@ export class FadeCurve extends Curve {
         for(let i = 0; i < length; i++){
             const t = i / (length - 1)
             color[3] = 0xFF * fade(clamp(t + offset, 0, 1))
-            this.colors[i * 2 + 0] = this.colors[i * 2 + 1] = rgba.uint8Hex(color)
+            this.colors[i * 2 + 0] = this.colors[i * 2 + 1] = rgba.uint8Hex(color, material.premultiply ? color[3]/0xFF : 1)
         }
     }
 }

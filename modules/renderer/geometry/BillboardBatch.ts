@@ -75,13 +75,14 @@ export class BillboardBatch extends Geometry2D<BillboardBatchOptions> {
         if(this.lastFrame != -1) return
         this.lastFrame = frame
 
-        this.loadBatch(this.billboards, material.diffuse)
+        this.loadBatch(this.billboards, material)
         
         if(transform) this.recalculateVertices(this.vertices as any, transform.globalTransform, this.vertices)
         this.recalculateBoundingBox()
     }
-    private loadBatch(billboards: Billboard[], texture: TextureResource){
+    private loadBatch(billboards: Billboard[], material: Material){
         const { vertices, uvs, colors } = this
+        const texture = material.diffuse
 
         const left = texture.frame[0] / texture.width - 0.5
         const right = left + texture.frame[2] / texture.width
@@ -90,7 +91,7 @@ export class BillboardBatch extends Geometry2D<BillboardBatchOptions> {
 
         for(let i = 0; i < billboards.length; i++){
             const { position, rotation, scale, color } = billboards[i]
-            const colorHex = rgba.uint8Hex(color)
+            const colorHex = rgba.uint8Hex(color, material.premultiply ? color[3]/0xFF : 1)
             const index = i * 4
 
             colors[index + 0] = colors[index + 1] = colors[index + 2] = colors[index + 3] = colorHex

@@ -82,7 +82,7 @@ export class VectorGraphics extends Geometry2D<VectorGraphicsOptions> {
             color[2] = this.colorArray[i * 4 + 2]
             color[3] = this.colorArray[i * 4 + 3]
             rgba.multiply(color, material.color, color)
-            this.colors[i] = rgba.uint8Hex(color)
+            this.colors[i] = rgba.uint8Hex(color, material.premultiply ? color[3]/0xFF : 1)
         }
         
         this.indices.set(this.indexArray)

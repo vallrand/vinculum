@@ -76,14 +76,14 @@ Bitmap.pad = ({ extrude = false, padding = 0 }) => bitmap => {
     Bitmap.copy(bitmap, padded, padding, padding)
 
     if(extrude){
-        for(let x = padding - 1; x >= 0; x--){
+        if(frame.x >= 0) for(let x = padding - 1; x >= 0; x--)
             Bitmap.copy(padded, padded, x, 0, padding, 0, 1, padded.height)
+        if(frame.x + frame.width >= padded.meta.width) for(let x = padding - 1; x >= 0; x--)
             Bitmap.copy(padded, padded, padded.width - x - 1, 0, padded.width - padding - 1, 0, 1, padded.height)
-        }
-        for(let y = padding - 1; y >= 0; y--){
+        if(frame.y >= 0) for(let y = padding - 1; y >= 0; y--)
             Bitmap.copy(padded, padded, 0, y, 0, padding, padded.width, 1)
+        if(frame.y + frame.height >= padded.meta.height) for(let y = padding - 1; y >= 0; y--)
             Bitmap.copy(padded, padded, 0, padded.height - y - 1, 0, padded.height - padding - 1, padded.width, 1)
-        }
     }
     
     return padded

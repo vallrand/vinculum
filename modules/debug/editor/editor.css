@@ -165,7 +165,6 @@ button {
 	background-color: rgba(255, 255, 255, 0.6);
 }
 .editor-tab.active {
-	pointer-events: none;
 	background-color: rgba(255, 0, 55, 0.6);
     color: #000000;
 }

@@ -5,7 +5,7 @@
   "scripts": {
     "build": "webpack -p --config ./webpack.config.js",
     "start": "webpack-dev-server --config ./webpack.config.js",
-    "prepare": "node ./tasks/prepare.js ./demo/assets ./output"
+    "process": "node ./tasks/index.js ./demo/assets ./output"
   },
   "repository": {
     "type": "git",

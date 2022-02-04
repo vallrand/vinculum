@@ -5,7 +5,7 @@ export type rgb = vec3
 export const rgb = (r: number = 0, g: number = 0, b: number = 0): rgb =>
 vec3.fromValues(r,g,b, new Uint8ClampedArray(3) as any)
 
-rgb.uint8Hex = (rgb: rgb): number => rgb[0] | rgb[1] << 8 | rgb[2] << 16
+rgb.uint8Hex = (rgb: rgb, scale: number): number => scale*rgb[0] | scale*rgb[1] << 8 | scale*rgb[2] << 16
 rgb.copy = vec3.copy
 rgb.lerp = vec3.lerp
 
@@ -24,7 +24,7 @@ rgba.multiply = (a: rgba, b: rgba, out: rgba): rgba => {
     return out
 }
 
-rgba.uint8Hex = (rgba: rgba): number => rgba[0] | rgba[1] << 8 | rgba[2] << 16 | rgba[3] << 24
+rgba.uint8Hex = (rgba: rgba, scale: number): number => scale*rgba[0] | scale*rgba[1] << 8 | scale*rgba[2] << 16 | rgba[3] << 24
 rgba.floatHex = (rgba: vec4): number => (
     0x000000FF & (rgba[0] * 0xFF << 0) |
     0x0000FF00 & (rgba[1] * 0xFF << 8) |

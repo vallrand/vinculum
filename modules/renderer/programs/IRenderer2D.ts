@@ -7,7 +7,6 @@ import { Material } from '../Material'
 export interface GlobalUniforms {
     defaultTexture: Texture
     defaultRenderTarget: RenderTarget
-    premultipliedAlpha: boolean
     renderTarget: RenderTarget
     [key: string]: any
 }
