@@ -13,7 +13,7 @@ npm run start //development
 npm run build //production
 ```
 
-Open Browser at `http://127.0.0.1:9000`
+Open Browser at `http://127.0.0.1:9000?debug`
 
 ### Features
 

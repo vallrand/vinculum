@@ -1,6 +1,7 @@
 const Bitmap = ({ width, height, data, ...meta }) => ({
     width, height,
     data: data || new Uint8Array(width * height * 4),
+    crop: { left: 0, right: 0, top: 0, bottom: 0 },
     frame: { x: 0, y: 0, width, height },
     ...meta
 })
@@ -25,7 +26,7 @@ Bitmap.copy = (
     return target
 }
 Bitmap.trim = ({ alphaThreshold = 0 }) => bitmap => {
-    const { width, height, data, frame } = bitmap
+    const { width, height, data, frame, crop } = bitmap
 
     const threshold = 0xFF * alphaThreshold
     let left = width - 1, right = 0
@@ -47,6 +48,12 @@ Bitmap.trim = ({ alphaThreshold = 0 }) => bitmap => {
         width: right - left + 1,
         height: bottom - top + 1,
         meta: bitmap.meta,
+        crop: {
+            left: Math.max(0, crop.left - left),
+            top: Math.max(0, crop.top - top),
+            right: Math.max(0, crop.right - (width - 1 - right)),
+            bottom: Math.max(0, crop.bottom - (height - 1 - bottom))
+        },
         frame: {
             x: frame.x - left,
             y: frame.y - top,
@@ -60,12 +67,18 @@ Bitmap.trim = ({ alphaThreshold = 0 }) => bitmap => {
 Bitmap.pad = ({ extrude = false, padding = 0 }) => bitmap => {
     if(!padding) return bitmap
 
-    const { width, height, data, frame } = bitmap
+    const { width, height, data, frame, crop } = bitmap
 
     const padded = Bitmap({
         width: width + 2 * padding,
         height: height + 2 * padding,
         meta: bitmap.meta,
+        crop: {
+            left: crop.left + padding,
+            right: crop.right + padding,
+            top: crop.top + padding,
+            bottom: crop.bottom + padding
+        },
         frame: {
             x: frame.x + padding,
             y: frame.y + padding,
@@ -78,11 +91,11 @@ Bitmap.pad = ({ extrude = false, padding = 0 }) => bitmap => {
     if(extrude){
         if(frame.x >= 0) for(let x = padding - 1; x >= 0; x--)
             Bitmap.copy(padded, padded, x, 0, padding, 0, 1, padded.height)
-        if(frame.x + frame.width >= padded.meta.width) for(let x = padding - 1; x >= 0; x--)
+        if(frame.width - frame.x <= width) for(let x = padding - 1; x >= 0; x--)
             Bitmap.copy(padded, padded, padded.width - x - 1, 0, padded.width - padding - 1, 0, 1, padded.height)
         if(frame.y >= 0) for(let y = padding - 1; y >= 0; y--)
             Bitmap.copy(padded, padded, 0, y, 0, padding, padded.width, 1)
-        if(frame.y + frame.height >= padded.meta.height) for(let y = padding - 1; y >= 0; y--)
+        if(frame.height - frame.y <= height) for(let y = padding - 1; y >= 0; y--)
             Bitmap.copy(padded, padded, 0, padded.height - y - 1, 0, padded.height - padding - 1, padded.width, 1)
     }
     

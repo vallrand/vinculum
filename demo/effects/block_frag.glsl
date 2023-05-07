@@ -23,7 +23,7 @@ float noise(vec2 n){
 	return mix(mix(rand(b), rand(b + d.yx), f.x), mix(rand(b + d.xy), rand(b + d.yy), f.x), f.y);
 }
 
-float fbm(in vec2 p, in float time){
+float fbm(in vec2 p, in float time, in int octaves, in float lacunarity, in float gain){
 	float z=2.0;
     float rz=0.0;
     float n = noise(p * 0.5 + vec2(0.0, time));
@@ -31,32 +31,34 @@ float fbm(in vec2 p, in float time){
 	for(int i=1;i<4;i++){
         p += vec2(n,time*0.5);
 
-        n = noise(p + n);
+        n = noise(p + n - time / z);
         rz += (sin(n*5.0)*0.5+0.5) / z;
 				
-		z *= 1.2;
-		p *= 2.0;
-        p *= rm;
+		z *= gain;
+        p *= rm * lacunarity;
 	}
 	return rz;	
 }
 
-float frame(in float width){
-    vec2 rect = abs(vUV - 0.5);
+float frame(in vec2 uv, in float width, in vec2 offset){
+    vec2 rect = abs(uv - 0.5) + offset;
     return smoothstep(0.5, 0.5 - width, max(rect.x, rect.y));
 }
 
 void main(void){
     vec2 uv = vWorldPosition * 0.016;
-    float fr = frame(0.1);
-    float rz = fbm(uv, uTime) * smoothstep(.0,.5,fr);
+    float n0 = fbm(uv, uTime, 4, 2.0, 1.2);
+    float border = 0.1;
+    float fr = frame(vUV, border, vec2(border * n0));
+    float rz = n0 * smoothstep(.0,.5,fr);
 
-    vec3 color = vec3(1.0-rz*rz, 0.2 / rz, 0.2 / rz);
-    color = pow(color, vec3(1.6,2.0,2.0));
+    vec3 color = vec3(1.0 - rz);
+    color = mix(color, vec3(0.6,0.1,0.2), smoothstep(0.8,0.2,rz*rz));
+    color = 0.8 * mix(color, vec3(0.8,0.6,0.6), smoothstep(0.2,0.0,rz*rz));
 
     float width = 0.2;
     float edge = mix(-width, 1.0, vColor.a * fr);
-    float fade = smoothstep(edge, edge + width, clamp(color.r,0.0,1.0));
+    float fade = smoothstep(edge, edge + width, max(0.0, 1.0-rz));
     color.gb *= smoothstep(0.8, 0.5, fade);
 
     color.rgb = floor(color.rgb * 8. + .5) / 8.;

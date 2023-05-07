@@ -1,5 +1,5 @@
 import { DisjointSet, Stream } from 'common'
-import { vec2, mat3x2, rgb, rgba, lerp, step, ease } from 'math'
+import { vec2, mat3x2, rgb, rgba, lerp, step, ease, range } from 'math'
 import { ProcedureSystem, EntityManager, IUpdateContext, DataView } from 'framework'
 import { Transform2D, AnimationMixer, KeyframeSampler, ParticleEmitter } from 'scene'
 import { Material, BlendMode, Curve, Mesh2D, Sprite2D } from 'renderer'
@@ -243,7 +243,10 @@ export class PuzzleSystem extends ProcedureSystem {
                 states[i] = neighbour ? PuzzleKnotState.OPENED : PuzzleKnotState.CLOSED
         }
     }
-    private advance(index: number, knots: PuzzleKnot[], pairs: boolean[], states: PuzzleKnotState[]){
+    private advance(index: number, knots: {
+        type: PuzzleKnotType
+        group: number
+    }[], pairs: boolean[], states: PuzzleKnotState[]){
         const length = knots.length
         if(states[index] !== PuzzleKnotState.OPENED) return
         states[index] = knots[index].type === PuzzleKnotType.TOGGLE ? PuzzleKnotState.CLOSED : PuzzleKnotState.ENABLED
@@ -304,5 +307,75 @@ export class PuzzleSystem extends ProcedureSystem {
         if(index === 111){
             states[114] = PuzzleKnotState.OPENED
         }
+    }
+    private toggle_guide: boolean = false
+    showSolutionGuide(toggle: boolean){
+        const trigger = !this.toggle_guide && toggle
+        this.toggle_guide = toggle
+        if(!trigger) return
+        const path = this.solve()
+        if(!path) return
+        const knots: PuzzleKnot[] = this.knots.data as any
+        const delay = 0.5, duration = 0.5, transition = 0.2
+        for(let i = 0; i < path.length; i++){
+            const knot = knots[path[i]]
+            this.manager.aquireComponent<AnimationMixer>(knot.entity, AnimationMixer)
+                .createAnimation(PuzzleKnotAnimation.HIGHLIGHT)
+                .start(i * delay, transition)
+                .end(i * delay + duration, transition)
+        }
+    }
+    private solve(limit = 1e3): number[] {
+        const knots: PuzzleKnot[] = this.knots.data as any
+        let last_group = Infinity
+        for(let i = knots.length - 1; i >= 0; i--){
+            if(knots[i].type === PuzzleKnotType.ENTRY && knots[i].state != PuzzleKnotState.ENABLED)
+            last_group = Math.min(last_group, knots[i].group)
+        }
+        if(!isFinite(last_group)) return
+        const subset = knots.map(({ group, state, type }, index) => ({
+            group: 0, global_group: group, state, type, index,
+        })).filter(knot => knot.global_group === last_group)
+
+        const pairs = new Uint16Array(subset.length * subset.length)
+        for(let i0 = 0; i0 < subset.length; i0++) for(let i1 = 0; i1 < subset.length; i1++)
+            pairs[i0 + i1 * subset.length] = this.pairs[subset[i0].index + subset[i1].index * knots.length]
+
+        const mod = 3
+        const encode = (states: PuzzleKnotState[]): number => states.reduce((total, state, i) =>
+            total + ((state + mod) % mod) * Math.pow(mod, i)
+        , 0)
+        const decode = (key: number, length: number): PuzzleKnotState[] => range(length)
+            .map(i => Math.floor(key / Math.pow(mod, i)) % mod)
+
+        console.log(`%csolving ${last_group}) /${subset.length}`, 'color:#f5dd42;text-decoration:underline')
+        const visited: Record<number, number> = Object.create(null)
+        const reached: [number, number][] = []
+        const stack = [subset.map(knot => knot.state)]
+        const actions = [-1]
+        visited[encode(stack[0])] = -1
+        outer: for(let iteration = 0, index = 0; iteration < limit; iteration++)
+            for(let max = stack.length; index < max; index++){
+                const prev_state = stack[index]
+                for(let i = 0; i < prev_state.length; i++)
+                    if(prev_state[i] === PuzzleKnotState.OPENED){
+                        const next_state = prev_state.slice()
+                        this.advance(i, subset, pairs as any, next_state)
+                        const key = encode(next_state)
+                        if(visited[key] != null) continue
+                        if(key === 0) reached.push([i, index])
+                        else{
+                            visited[key] = index
+                            stack.push(next_state)
+                            actions.push(i)
+                        }
+                    }
+            }
+        if(!reached.length) return []
+        const optimal = reached.find(([i, prev]) => subset[i].type === PuzzleKnotType.ENTRY) || reached[0]
+        const path = [optimal[0]]
+        for(let index = optimal[1]; index >= 0; index = visited[encode(stack[index])])
+            path.push(actions[index])
+        return path.reverse().slice(1).map(action => subset[action].index)
     }
 }

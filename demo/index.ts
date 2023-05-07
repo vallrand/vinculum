@@ -20,7 +20,8 @@ Application({
         'down': ['ArrowDown','KeyS'],
         'right': ['ArrowRight','KeyD'],
         'left': ['ArrowLeft','KeyA'],
-        'action': ['Space']
+        'action': ['Space'],
+        'guide': ['KeyH']
     },
     width: 800, height: 600,
     initialize(manager: EntityManager){

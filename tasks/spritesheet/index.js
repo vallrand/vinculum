@@ -56,26 +56,24 @@ module.exports = options => {
                     const {
                         x: offdetX, y: offsetY, width: frameWidth, height: frameHeight
                     } = reference.frame
-                    
-                    const left = Math.max(0, offdetX)
-                    const top = Math.max(0, offsetY)
-                    const right = Math.min(offdetX + frameWidth, reference.width)
-                    const bottom = Math.min(offsetY + frameHeight, reference.height)
+
+                    const { left, top, right, bottom } = reference.crop
                     const scaleX = sourceWidth / frameWidth
                     const scaleY = sourceHeight / frameHeight
+                    const frame = {
+                        x: x + left,
+                        y: y + top,
+                        w: reference.width - left - right,
+                        h: reference.height - top - bottom
+                    }
                     
                     hashMap[filename] = {
-                        frame: {
-                            x: x + left,
-                            y: y + top,
-                            w: right - left,
-                            h: bottom - top
-                        },
+                        frame,
                         spriteSourceSize: {
                             x: (left - offdetX) * scaleX,
                             y: (top - offsetY) * scaleY,
-                            w: (right - left) * scaleX,
-                            h: (bottom - top) * scaleY
+                            w: frame.w * scaleX,
+                            h: frame.h * scaleY
                         },
                         sourceSize: {
                             w: sourceWidth,

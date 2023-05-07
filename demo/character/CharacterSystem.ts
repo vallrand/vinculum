@@ -92,6 +92,7 @@ export class CharacterSystem extends ProcedureSystem {
         const up: number = +keys.keyDown(ControlKey.UP)
         const down: number = +keys.keyDown(ControlKey.DOWN)
         const action: boolean = keys.keyDown(ControlKey.ACTION)
+        const guide: boolean = keys.keyDown(ControlKey.GUIDE)
         const actionStart = !this.hold && action
         this.hold = action
 
@@ -127,6 +128,7 @@ export class CharacterSystem extends ProcedureSystem {
         transform.localScale[0] = controller.direction[0]
 
         const puzzles = this.manager.resolveSystem(PuzzleSystem)
+        puzzles.showSolutionGuide(guide)
         const trigger = puzzles.updatePuzzle(transform.globalTransform, 120, currentAnimation === null && actionStart)
 
         if(currentAnimation === null && actionStart)

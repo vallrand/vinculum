@@ -44,7 +44,7 @@ function(this: Store, resource: IResource){
         flipY: false,
         premultiplyAlpha: true,
         wrap: GL.REPEAT,
-        minFilter: GL.LINEAR_MIPMAP_NEAREST,
+        minFilter: GL.LINEAR,
         magFilter: GL.LINEAR
     })
     resource.data = <TextureResource> {
